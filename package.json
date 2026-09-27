@@ -1,12 +1,8 @@
 {
-  "name": "samurai-parallax",
+  "name": "samurai",
   "version": "1.0.0",
-  "description": "SAMURAI — 60FPS Parallax Storytelling Web Experience",
-  "main": "index.html",
+  "private": true,
   "scripts": {
-    "start": "node server.js"
-  },
-  "keywords": ["samurai", "parallax", "canvas", "html5"],
-  "author": "Samarth Dhage",
-  "license": "MIT"
+    "build": "echo 'Deploying static site'"
+  }
 }
