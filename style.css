@@ -1,0 +1,590 @@
+/* ==========================================================================
+   SAMURAI — FULLSCREEN FIXED PARALLAX ENGINE (ZERO BOXES, 100% CLEAN)
+   ========================================================================== */
+
+:root {
+    --bg-dark: #050507;
+    --crimson: #d91438;
+    --crimson-glow: rgba(217, 20, 56, 0.45);
+    --gold: #d4af37;
+    --gold-bright: #ffd700;
+    --gold-glow: rgba(212, 175, 55, 0.35);
+    --silver: #e4e7ec;
+    --text-primary: #ffffff;
+    --text-muted: #8b92a5;
+    
+    --font-heading: 'Cinzel', serif;
+    --font-display: 'Cinzel Decorative', serif;
+    --font-kanji: 'Shippori Mincho', serif;
+    --font-body: 'Outfit', sans-serif;
+}
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Locked inside viewport: wheel/touch directly scrubs frames */
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 16px;
+    user-select: none;
+    cursor: default;
+}
+
+/* Custom Reticle Cursor */
+.cursor-dot {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: var(--gold-bright);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px var(--gold-bright);
+}
+
+.cursor-blade {
+    position: fixed;
+    width: 24px;
+    height: 24px;
+    border: 1.5px solid var(--crimson);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.08s ease-out;
+}
+
+/* Background Floating Sakura & Ember Particles */
+.particle-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* ==========================================================================
+   FAST PRELOADER
+   ========================================================================== */
+.loader-overlay {
+    position: fixed;
+    inset: 0;
+    background: #040406;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.7s cubic-bezier(0.23, 1, 0.32, 1), visibility 0.7s;
+}
+
+.loader-overlay.loaded {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.2rem;
+}
+
+.loader-seal {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #8a0c20 0%, #d91438 100%);
+    color: #fff;
+    font-family: var(--font-kanji);
+    font-size: 2.2rem;
+    font-weight: 900;
+    border-radius: 6px;
+    box-shadow: 0 0 25px var(--crimson-glow);
+    animation: loaderPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes loaderPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 25px var(--crimson-glow); }
+    50% { transform: scale(1.08); box-shadow: 0 0 45px rgba(217, 20, 56, 0.8); }
+}
+
+.loader-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    letter-spacing: 0.3em;
+    color: #fff;
+}
+
+.loader-bar-wrap {
+    width: 240px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.loader-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--crimson));
+    transition: width 0.15s ease-out;
+}
+
+.loader-text {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    color: var(--text-muted);
+    font-family: monospace;
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3.5rem;
+    z-index: 1000;
+    background: linear-gradient(180deg, rgba(5, 5, 7, 0.85) 0%, rgba(5, 5, 7, 0) 100%);
+    pointer-events: none;
+}
+
+.logo-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    pointer-events: auto;
+}
+
+.kanji-seal {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #8a0c20 0%, #d91438 100%);
+    color: #fff;
+    font-family: var(--font-kanji);
+    font-size: 1.35rem;
+    font-weight: 800;
+    border-radius: 4px;
+    box-shadow: 0 0 15px var(--crimson-glow);
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-name {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: 0.25em;
+    color: #fff;
+    line-height: 1;
+}
+
+.brand-sub {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    font-weight: 600;
+    margin-top: 3px;
+}
+
+.header-right {
+    pointer-events: auto;
+}
+
+.hud-pill-btn {
+    background: rgba(16, 16, 22, 0.8);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: var(--text-primary);
+    padding: 0.55rem 1.2rem;
+    border-radius: 30px;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+}
+
+.hud-pill-btn:hover {
+    border-color: var(--gold);
+    box-shadow: 0 0 15px var(--gold-glow);
+}
+
+.hud-pill-btn.active {
+    border-color: var(--crimson);
+}
+
+.audio-waves {
+    display: flex;
+    align-items: center;
+    gap: 2.5px;
+    height: 12px;
+}
+
+.audio-waves span {
+    width: 2px;
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+    animation: wave 1s infinite alternate ease-in-out;
+    animation-play-state: paused;
+}
+
+.hud-pill-btn.active .audio-waves span {
+    animation-play-state: running;
+}
+
+.audio-waves span:nth-child(1) { height: 40%; animation-delay: 0.1s; }
+.audio-waves span:nth-child(2) { height: 100%; animation-delay: 0.3s; }
+.audio-waves span:nth-child(3) { height: 60%; animation-delay: 0.2s; }
+
+@keyframes wave {
+    0% { transform: scaleY(0.2); }
+    100% { transform: scaleY(1); }
+}
+
+/* ==========================================================================
+   VIEWPORT STAGE & CANVAS
+   ========================================================================== */
+.viewport-stage {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+}
+
+.samurai-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.cinematic-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 45%, rgba(5,5,7,0.5) 80%, rgba(0,0,0,0.85) 100%);
+    pointer-events: none;
+    z-index: 4;
+}
+
+.scanline-overlay {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.12),
+        rgba(0, 0, 0, 0.12) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.slash-flash {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 30;
+    transition: opacity 0.05s ease-out;
+}
+
+.slash-flash.flash {
+    opacity: 0.85;
+}
+
+.kanji-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-kanji);
+    font-size: clamp(10rem, 30vw, 26rem);
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.025);
+    letter-spacing: 0.1em;
+    pointer-events: none;
+    line-height: 1;
+    z-index: 6;
+    transition: transform 0.1s ease-out;
+}
+
+/* ==========================================================================
+   PURE FLOATING TITLE TYPOGRAPHY (ZERO BULKY BOXES!)
+   ========================================================================== */
+.title-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 20;
+    pointer-events: none;
+    max-width: 850px;
+    width: 90%;
+    transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.title-overlay.hidden {
+    opacity: 0;
+    transform: translate(-50%, -60%) scale(0.95);
+}
+
+.badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(217, 20, 56, 0.2);
+    border: 1px solid rgba(217, 20, 56, 0.45);
+    padding: 0.35rem 1.1rem;
+    border-radius: 30px;
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    color: #ff5277;
+    margin-bottom: 1.2rem;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(217, 20, 56, 0.5);
+}
+
+.pulse-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--crimson);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--crimson);
+}
+
+.main-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin-bottom: 1rem;
+}
+
+.title-jp {
+    font-family: var(--font-kanji);
+    font-size: clamp(1.2rem, 3vw, 2.2rem);
+    color: var(--gold);
+    letter-spacing: 0.4em;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.title-en {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 9.5vw, 7.2rem);
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    background: linear-gradient(135deg, #ffffff 0%, var(--gold) 50%, var(--crimson) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 40px rgba(217, 20, 56, 0.5);
+    line-height: 1;
+}
+
+.title-desc {
+    font-size: clamp(0.95rem, 1.2vw, 1.15rem);
+    color: var(--silver);
+    line-height: 1.6;
+    font-weight: 300;
+    max-width: 580px;
+    margin: 0 auto 1.8rem;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+}
+
+.scroll-indicator {
+    display: flex;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 1.3rem;
+    animation: bounce 1.8s infinite ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50% { transform: translateY(8px); opacity: 1; }
+}
+
+/* ==========================================================================
+   SUBTLE BOTTOM-LEFT CHAPTER SUBTITLE (PURE MINIMALIST)
+   ========================================================================== */
+.chapter-subtitle {
+    position: absolute;
+    bottom: 5.5rem;
+    left: 3.5rem;
+    z-index: 20;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.chapter-subtitle.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.sub-chapter {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.25em;
+    color: var(--crimson);
+}
+
+.sub-title {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+}
+
+.sub-kanji {
+    font-family: var(--font-kanji);
+    font-size: 0.95rem;
+    color: var(--gold);
+    letter-spacing: 0.25em;
+}
+
+/* ==========================================================================
+   BOTTOM PARALLAX HUD SCRUBBER
+   ========================================================================== */
+.parallax-hud {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 25;
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    background: rgba(10, 10, 15, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 0.55rem 1.4rem;
+    border-radius: 40px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+}
+
+.hud-frame-counter {
+    font-family: monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    display: flex;
+    gap: 0.25rem;
+}
+
+.hud-divider {
+    color: var(--text-muted);
+}
+
+.hud-progress-rail {
+    width: 180px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+}
+
+.hud-progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold), var(--crimson));
+    border-radius: 4px;
+    box-shadow: 0 0 10px var(--crimson-glow);
+}
+
+.hud-scrub-thumb {
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border: 2px solid var(--crimson);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 8px var(--crimson);
+    pointer-events: none;
+}
+
+.hud-scroll-hint {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 768px) {
+    .site-header {
+        padding: 0 1.5rem;
+    }
+    .chapter-subtitle {
+        left: 1.5rem;
+        bottom: 5rem;
+    }
+    .parallax-hud {
+        bottom: 1.2rem;
+        padding: 0.4rem 1rem;
+        gap: 0.8rem;
+    }
+    .hud-progress-rail {
+        width: 100px;
+    }
+    .hud-scroll-hint {
+        display: none;
+    }
+}

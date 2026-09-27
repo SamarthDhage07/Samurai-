@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAMURAI — Pure Parallax Experience</title>
+    <meta name="description" content="Cinematic 60FPS wheel and touch-driven parallax frame storytelling.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&family=Shippori+Mincho:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Fast Preloader -->
+    <div id="loader" class="loader-overlay">
+        <div class="loader-content">
+            <div class="loader-seal">侍</div>
+            <h2 class="loader-title">SAMURAI</h2>
+            <div class="loader-bar-wrap">
+                <div id="loader-bar" class="loader-bar"></div>
+            </div>
+            <span id="loader-text" class="loader-text">INITIALIZING FRAMES 0%</span>
+        </div>
+    </div>
+
+    <!-- Custom Reticle Cursor -->
+    <div id="cursor-dot" class="cursor-dot"></div>
+    <div id="cursor-blade" class="cursor-blade"></div>
+
+    <!-- Floating Sakura & Ember Particles Canvas -->
+    <canvas id="particle-canvas" class="particle-canvas"></canvas>
+
+    <!-- Header HUD -->
+    <header class="site-header">
+        <div class="logo-group">
+            <span class="kanji-seal">侍</span>
+            <div class="brand-text">
+                <span class="brand-name">SAMURAI</span>
+                <span class="brand-sub">武士道 • THE WAY OF THE WARRIOR</span>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <button id="sound-btn" class="hud-pill-btn" title="Toggle Sound">
+                <i class="fa-solid fa-volume-xmark" id="sound-icon"></i>
+                <span id="sound-label">SOUND OFF</span>
+                <div class="audio-waves">
+                    <span></span><span></span><span></span>
+                </div>
+            </button>
+        </div>
+    </header>
+
+    <!-- FULLSCREEN FIXED PARALLAX STAGE -->
+    <div class="viewport-stage" id="viewport-stage">
+        
+        <!-- Hardware Canvas -->
+        <canvas id="samurai-canvas" class="samurai-canvas"></canvas>
+
+        <!-- Overlays -->
+        <div class="cinematic-vignette"></div>
+        <div class="scanline-overlay"></div>
+        <div class="slash-flash" id="slash-flash"></div>
+
+        <!-- Floating Background Watermark -->
+        <div class="kanji-watermark" id="kanji-watermark">侍</div>
+
+        <!-- Pure Floating Typography (NO bulky boxes or borders) -->
+        <div class="title-overlay" id="title-overlay">
+            <span class="badge-pill"><span class="pulse-dot"></span> FEUDAL JAPAN TALE</span>
+            <h1 class="main-title">
+                <span class="title-jp">孤高の剣士</span>
+                <span class="title-en">SAMURAI</span>
+            </h1>
+            <p class="title-desc">Scroll to draw the blade and advance through the duel.</p>
+            <div class="scroll-indicator">
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+        </div>
+
+        <!-- Subtle Chapter Subtitles Floating at the Bottom-Left -->
+        <div class="chapter-subtitle" id="chapter-subtitle">
+            <span class="sub-chapter" id="sub-chapter">CHAPTER 01</span>
+            <h3 class="sub-title" id="sub-title">The Path of the Ronin</h3>
+            <span class="sub-kanji" id="sub-kanji">孤高の構え</span>
+        </div>
+
+        <!-- Interactive Parallax Bottom HUD Scrubber -->
+        <div class="parallax-hud">
+            <div class="hud-frame-counter">
+                <span id="frame-num">001</span>
+                <span class="hud-divider">/</span>
+                <span id="frame-total">631</span>
+            </div>
+            <div class="hud-progress-rail" id="hud-rail">
+                <div id="hud-progress-fill" class="hud-progress-fill"></div>
+                <div id="hud-scrub-thumb" class="hud-scrub-thumb"></div>
+            </div>
+            <span class="hud-scroll-hint">SCROLL / DRAG TO ADVANCE</span>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
